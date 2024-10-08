@@ -124,7 +124,7 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
     const double padding = 15;
 
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: widget.entityId,
       ),
       body: Center(

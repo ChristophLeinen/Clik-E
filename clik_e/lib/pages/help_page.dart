@@ -7,7 +7,7 @@ class HelpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Hilfe",
       ),
       body: const Center(

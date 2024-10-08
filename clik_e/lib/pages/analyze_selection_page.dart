@@ -28,7 +28,7 @@ class _AnalyzeSelectionPageState extends State<AnalyzeSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Analyse",
       ),
       body: Center(

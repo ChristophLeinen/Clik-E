@@ -52,7 +52,7 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
     const double padding = 15;
 
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Evaluierung",
       ),
       body: Center(

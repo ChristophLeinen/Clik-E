@@ -12,7 +12,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Analyse",
       ),
       body: const Center(

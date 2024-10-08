@@ -15,7 +15,7 @@ class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Hauptmenü",
       ),
       backgroundColor: Colors.white,

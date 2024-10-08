@@ -2,11 +2,11 @@ import 'package:clik_e/pages/menu_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const CliKApp());
+  runApp(const CliKASA());
 }
 
-class CliKApp extends StatelessWidget {
-  const CliKApp({super.key});
+class CliKASA extends StatelessWidget {
+  const CliKASA({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -18,7 +18,7 @@ class ConfigurationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Verwaltung",
       ),
       body: Center(

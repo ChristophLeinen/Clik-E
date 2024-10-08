@@ -283,7 +283,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
     }
 
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: "Evaluierung",
       ),
       body: SingleChildScrollView(

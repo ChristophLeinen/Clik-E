@@ -68,7 +68,7 @@ class _ConfigurationOverviewPageState extends State<ConfigurationOverviewPage> {
     const double padding = 15;
 
     return Scaffold(
-      appBar: ClikAppBar(
+      appBar: CliKASAAppBar(
         title: widget.tableName,
       ),
       body: Center(
