@@ -1,0 +1,40 @@
+{
+    "items": [
+        {
+            "id": "F00000001",
+            "name": "Wissen"
+        },
+        {
+            "id": "F00000002",
+            "name": "Fokus"
+        },
+        {
+            "id": "F00000003",
+            "name": "Struktur"
+        },
+        {
+            "id": "F00000004",
+            "name": "Transfer"
+        },
+        {
+            "id": "F00000005",
+            "name": "Problemlösen"
+        },
+        {
+            "id": "F00000006",
+            "name": "Kreativität"
+        },
+        {
+            "id": "F00000007",
+            "name": "Reflexionsfähigkeit"
+        },
+        {
+            "id": "F00000008",
+            "name": "Perspektivenwechselfähigkeit, Kommunikations- und Kooperationsfähigkeit"
+        },
+        {
+            "id": "F00000009",
+            "name": "Selbstwirksamkeit"
+        }
+    ]
+}

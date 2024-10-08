@@ -1,0 +1,148 @@
+{
+    "items": [
+        {
+            "id": "Q00000001",
+            "question":
+                "Die Schülerin oder der Schüler versteht viel vom aktuellen Thema.",
+            "feature": "F00000001"
+        },
+        {
+            "id": "Q00000002",
+            "question":
+                "Die Schülerin oder der Schüler verfügt über solides Grundwissen zum aktuellen Thema.",
+            "feature": "F00000001"
+        },
+        {
+            "id": "Q00000003",
+            "question":
+                "Die Schülerin oder der Schüler ist im Unterricht mit dem Lernstoff beschäftigt.",
+            "feature": "F00000001"
+        },
+        {
+            "id": "Q00000004",
+            "question": "Die Schülerin oder der Schüler lässt sich nicht ablenken.",
+            "feature": "F00000002"
+        },
+        {
+            "id": "Q00000005",
+            "question":
+                "Die Schülerin oder der Schüler löst gerne Aufgaben der Informatik.",
+            "feature": "F00000002"
+        },
+        {
+            "id": "Q00000006",
+            "question": "Die Schülerin oder der Schüler sucht nach Strukturen.",
+            "feature": "F00000003"
+        },
+        {
+            "id": "Q00000007",
+            "question": "Die Schülerin oder der Schüler strukturiert Sachverhalte.",
+            "feature": "F00000003"
+        },
+        {
+            "id": "Q00000008",
+            "question": "Die Schülerin oder der Schüler wechselt zwischen Darstellungsformen.",
+            "feature": "F00000004"
+        },
+        {
+            "id": "Q00000009",
+            "question": "Die Schülerin oder der Schüler überträgt bekannte Lösungsstrategien oder Konzepte auf das aktuelle Problem.",
+            "feature": "F00000004"
+        },
+        {
+            "id": "Q00000010",
+            "question": "Die Schülerin oder der Schüler fasst Probleme schnell und sicher auf.",
+            "feature": "F00000005"
+        },
+        {
+            "id": "Q00000011",
+            "question": "Die Schülerin oder der Schüler definiert aktuelle und gewünschte Zustände.",
+            "feature": "F00000005"
+        },
+        {
+            "id": "Q00000012",
+            "question": "Die Schülerin oder der Schüler zerlegt Probleme in Teilprobleme.",
+            "feature": "F00000005"
+        },
+        {
+            "id": "Q00000013",
+            "question": "Die Schülerin oder der Schüler schreibt sich Überlegungen und Strategien beim Lösen von Problemen auf.",
+            "feature": "F00000005"
+        },
+        {
+            "id": "Q00000014",
+            "question": "Die Schülerin oder der Schüler nutzt informatische Konzepte beim Problemlösen.",
+            "feature": "F00000005"
+        },
+        {
+            "id": "Q00000015",
+            "question": "Die Schülerin oder der Schüler entwickelt (algorithmische) Lösungen.",
+            "feature": "F00000005"
+        },
+        {
+            "id": "Q00000016",
+            "question": "Die Schülerin oder der Schüler durchdenkt unterschiedliche Lösungswege.",
+            "feature": "F00000006"
+        },
+        {
+            "id": "Q00000017",
+            "question": "Die Schülerin oder der Schüler entwickelt originelle Lösungsideen.",
+            "feature": "F00000006"
+        },
+        {
+            "id": "Q00000018",
+            "question": "Die Schülerin oder der Schüler evaluiert mögliche Lösungen hinsichtlich des Nutzens und Angemessenheit.",
+            "feature": "F00000007"
+        },
+        {
+            "id": "Q00000019",
+            "question": "Die Schülerin oder der Schüler hinterfragt eigene Werthaltungen, Beiträge und Möglichkeiten.",
+            "feature": "F00000007"
+        },
+        {
+            "id": "Q00000020",
+            "question": "Die Schülerin oder der Schüler entwickelt begründete eigene Werturteile.",
+            "feature": "F00000007"
+        },
+        {
+            "id": "Q00000021",
+            "question": "Die Schülerin oder der Schüler versetzt sich in die Position anderer (z.B. die von Auftraggebern, Nutzern).",
+            "feature": "F00000008"
+        },
+        {
+            "id": "Q00000022",
+            "question": "Die Schülerin oder der Schüler reagiert verständnisvoll und respektvoll auf die Beiträge anderer.",
+            "feature": "F00000008"
+        },
+        {
+            "id": "Q00000023",
+            "question": "Die Schülerin oder der Schüler vermittelt anderen eigenes Wissen, Erkenntnisse, Erfahrungen verständlich.",
+            "feature": "F00000008"
+        },
+        {
+            "id": "Q00000024",
+            "question": "Die Schülerin oder der Schüler arbeitet mit anderen gemeinsam und fair zusammen.",
+            "feature": "F00000008"
+        },
+        {
+            "id": "Q00000025",
+            "question": "Die Schülerin oder der Schüler lässt sich nicht entmutigen (z. B. duch schwierige Aufgaben, Gruppenunterschiede).",
+            "feature": "F00000009"
+        },
+        {
+            "id": "Q00000026",
+            "question": "Die Schülerin oder der Schüler vertraut eigenen Fähigkeiten in schwierigen Situationen.",
+            "feature": "F00000009"
+        },
+        {
+            "id": "Q00000027",
+            "question": "Die Schülerin oder der Schüler kann die meisten Aufgaben selbstständig lösen.",
+            "feature": "F00000009"
+        },
+        {
+            "id": "Q00000028",
+            "question": "Die Schülerin oder der Schüler ist von der Qualität eigener Einreichungen überzeugt.",
+            "feature": "F00000009"
+        }
+    ]
+}

@@ -1,0 +1,126 @@
+{
+    "items": [
+        {
+            "id": "F00000001",
+            "name": "CliK",
+            "description": "Wie das alte CliK",
+            "creationDate": "2024-10-01 00:00:00.000",
+            "modificationDate": "2024-10-03 00:00:00.000",
+            "sections": [
+                {
+                    "label": "Wissen",
+                    "questions": [
+                        "Q00000001",
+                        "Q00000002"
+                    ]
+                },
+                {
+                    "label": "Fokus",
+                    "questions": [
+                        "Q00000003",
+                        "Q00000004",
+                        "Q00000005"
+                    ]
+                },
+                {
+                    "label": "Struktur",
+                    "questions": [
+                        "Q00000006",
+                        "Q00000007"
+                    ]
+                },
+                {
+                    "label": "Transfer",
+                    "questions": [
+                        "Q00000008",
+                        "Q00000009"
+                    ]
+                },
+                {
+                    "label": "Problemlösen",
+                    "questions": [
+                        "Q00000010",
+                        "Q00000011",
+                        "Q00000012",
+                        "Q00000013",
+                        "Q00000014",
+                        "Q00000015"
+                    ]
+                },
+                {
+                    "label": "Kreativität",
+                    "questions": [
+                        "Q00000016",
+                        "Q00000017"
+                    ]
+                },
+                {
+                    "label": "Reflexionsfähigkeit",
+                    "questions": [
+                        "Q00000018",
+                        "Q00000019",
+                        "Q00000020"
+                    ]
+                },
+                {
+                    "label": "Perspektivenwechselfähigkeit, Kommunikations- und Kooperationsfähigkeit",
+                    "questions": [
+                        "Q00000021",
+                        "Q00000022",
+                        "Q00000023",
+                        "Q00000024"
+                    ]
+                },
+                {
+                    "label": "Selbstwirksamkeit",
+                    "questions": [
+                        "Q00000025",
+                        "Q00000026",
+                        "Q00000027",
+                        "Q00000028"
+                    ]
+                }
+            ],
+            "suggestions": []
+        },
+        {
+            "id": "F00000002",
+            "name": "Mini Evaluation",
+            "description": "Die Kurz Variante",
+            "creationDate": "2024-10-01 12:14:02",
+            "modificationDate": "2024-10-03 20:27:03",
+            "sections": [
+                {
+                    "label": "Wissen",
+                    "questions": [
+                        "Q00000001",
+                        "Q00000002"
+                    ]
+                },
+                {
+                    "label": "Fokus",
+                    "questions": [
+                        "Q00000003",
+                        "Q00000004",
+                        "Q00000005"
+                    ]
+                },
+                {
+                    "label": "Struktur",
+                    "questions": [
+                        "Q00000006",
+                        "Q00000007"
+                    ]
+                },
+                {
+                    "label": "Transfer",
+                    "questions": [
+                        "Q00000008",
+                        "Q00000009"
+                    ]
+                }
+            ],
+            "suggestions": []
+        }
+    ]
+}

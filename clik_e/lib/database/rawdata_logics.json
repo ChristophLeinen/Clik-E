@@ -1,0 +1,14 @@
+{
+    "items": [
+        {
+            "id": "L00000001",
+            "name": "Hochbegabt",
+            "weightedFeatures": "Der Schüler nimmt zusätzlich am Unterricht der nächsten Jahrgangsstufe teil."
+        },
+        {
+            "id": "L00000002",
+            "name": "Schwach",
+            "weightedFeatures": "Der Schüler nimmt zusätzliche Nachhilfestunden."
+        }
+    ]
+}

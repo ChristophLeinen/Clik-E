@@ -1,0 +1,18 @@
+{
+    "items": [
+        {
+            "id": "S00000001",
+            "name": "Nächste Jahrgangsstufe",
+            "suggestionsInstructions": "Der Schüler nimmt zusätzlich am Unterricht der nächsten Jahrgangsstufe teil.",
+            "expertExplanation": "Der Schüler wird zusätzlich gefordert und langweilt sich nicht mehr.",
+            "expertReasoning": "Der Schüler kann sich durch seine Hochbegabung kaum auf den Unterricht fokusieren, da ihm der Stoff seiner Alterskameraden zu einfach erscheint."
+        },
+        {
+            "id": "S00000002",
+            "name": "Schwach",
+            "suggestionsInstructions": "Der Schüler nimmt zusätzliche Nachhilfestunden.",
+            "expertExplanation": "Dem Schüler wird häufigere Wiederholung helfen die Themen des Unterrichts besser zu verstehen.",
+            "expertReasoning": "Der Schüler scheint aktuell noch zu schwach zu sein um am aktuell Unterricht teilzuhaben."
+        }
+    ]
+}
