@@ -127,61 +127,55 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
       appBar: CliKASAAppBar(
         title: widget.entityId,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: FutureBuilder(
-                  future: _backendData,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: padding),
-                            Text("Eintrag wird geladen.")
-                          ]);
-                    }
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: FutureBuilder(
+              future: _backendData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: padding),
+                        Text("Eintrag wird geladen.")
+                      ]);
+                }
 
-                    if (snapshot.hasError) {
-                      return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                                "Ein Fehler ist aufgetreten, der Eintrag konnte nicht geladen werden."),
-                            const SizedBox(height: padding),
-                            Text(snapshot.error.toString()),
-                          ]);
-                    }
+                if (snapshot.hasError) {
+                  return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                            "Ein Fehler ist aufgetreten, der Eintrag konnte nicht geladen werden."),
+                        const SizedBox(height: padding),
+                        Text(snapshot.error.toString()),
+                      ]);
+                }
 
-                    if (!snapshot.hasData) {
-                      return const Text("Eintrag nicht gefunden.");
-                    }
+                if (!snapshot.hasData) {
+                  return const Text("Eintrag nicht gefunden.");
+                }
 
-                    return Column(children: [
-                      snapshot.data!.getEditControls(),
-                      const SizedBox(height: padding),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text("Speichern")),
-                            const SizedBox(width: padding),
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text("Abbrechen"))
-                          ])
-                    ]);
-                  }),
-            ),
-          ),
+                return Column(children: [
+                  snapshot.data!.getEditControls(),
+                  const SizedBox(height: padding),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Speichern")),
+                    const SizedBox(width: padding),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Abbrechen"))
+                  ])
+                ]);
+              }),
         ),
       ),
     );
