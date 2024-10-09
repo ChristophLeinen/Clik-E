@@ -3,12 +3,20 @@
         {
             "id": "L00000001",
             "name": "Hochbegabt",
-            "weightedFeatures": "Der Schüler nimmt zusätzlich am Unterricht der nächsten Jahrgangsstufe teil."
+            "weightedFeatures": {
+                "F00000001": 6,
+                "F00000004": 5,
+                "F00000009": 2
+            }
         },
         {
             "id": "L00000002",
             "name": "Schwach",
-            "weightedFeatures": "Der Schüler nimmt zusätzliche Nachhilfestunden."
+            "weightedFeatures": {
+                "F00000001": -5,
+                "F00000002": -5,
+                "F00000006": -8
+            }
         }
     ]
 }

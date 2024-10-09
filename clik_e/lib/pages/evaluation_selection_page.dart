@@ -20,8 +20,9 @@ class BackendData {
 }
 
 Future<BackendData> getBackendData() async {
-  var formsService = DataService<EvaluationForm>();
-  List<EvaluationForm> forms = await formsService.getItems("forms");
+  DataService formsService = DataService<EvaluationForm>();
+  List<EvaluationForm> forms =
+      await formsService.getItems("forms") as List<EvaluationForm>;
 
   return BackendData(forms);
 }

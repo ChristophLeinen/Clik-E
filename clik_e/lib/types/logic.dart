@@ -1,16 +1,19 @@
+import 'package:clik_e/services/data_provider_service.dart';
 import 'package:clik_e/types/data_object.dart';
+import 'package:clik_e/types/feature.dart';
 import 'package:flutter/material.dart';
 
 class Logic extends DataObject {
-  const Logic(id, this.name, this.weightedFeatures) : super(id);
+  Logic(id, this.name, this.weightedFeatures) : super(id);
 
-  final String name;
-  final String weightedFeatures;
+  String name;
+  Map<String, double> weightedFeatures;
 
   factory Logic.fromJson(dynamic parsedData) {
-    final id = parsedData["id"] as String;
-    final name = parsedData["name"] as String;
-    final weightedFeatures = parsedData["weightedFeatures"] as String;
+    String id = parsedData["id"];
+    String name = parsedData["name"];
+    Map<String, double> weightedFeatures =
+        Map<String, double>.from(parsedData["weightedFeatures"]);
     return Logic(id, name, weightedFeatures);
   }
 
@@ -44,25 +47,183 @@ class Logic extends DataObject {
   }
 
   @override
-  Widget getEditControls() {
+  Widget getEditControls(Function updateView) {
     final TextEditingController idController = TextEditingController();
     final TextEditingController nameController = TextEditingController();
     idController.text = id;
     nameController.text = name;
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+    const double padding = 16;
+
+    Future<List<Feature>> getAllFeatures() async {
+      return await DataService<Feature>().getItems("features");
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const Text("ID"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: idController,
-        enabled: false,
+      const SizedBox(
+        height: padding / 2,
       ),
-      const SizedBox(height: 16),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: idController,
+          enabled: false,
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
       const Text("Name"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: nameController,
+      const SizedBox(
+        height: padding / 2,
       ),
+      SizedBox(
+        width: 500,
+        child: TextField(
+            controller: nameController,
+            onChanged: (String newValue) {
+              name = newValue;
+            }),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
+      const Text("Gewichtete Kompetenzen und Eigenschaften"),
+      const SizedBox(
+        height: padding,
+      ),
+      FutureBuilder(
+          future: getAllFeatures(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const Text(
+                  "Kompetenzen und Eigenschaften konnten nicht geladen werden.");
+            }
+
+            List<DropdownMenuEntry> allFeatures = [];
+            List<DropdownMenuEntry> openFeatures = [];
+
+            for (int i = 0; i < snapshot.data!.length; ++i) {
+              if (!weightedFeatures.keys.contains(snapshot.data![i].id)) {
+                openFeatures.add(DropdownMenuEntry(
+                    value: snapshot.data![i].id,
+                    label: snapshot.data![i].name));
+              }
+              allFeatures.add(DropdownMenuEntry(
+                  value: snapshot.data![i].id, label: snapshot.data![i].name));
+            }
+
+            Row createFeature(
+                String feature,
+                double value,
+                Function(String, double, String) onSelected,
+                Function(double, String) changeValue,
+                Function(String) deleteFeature) {
+              List<DropdownMenuEntry> limitedFeatures = [];
+
+              limitedFeatures
+                  .add(allFeatures.firstWhere((DropdownMenuEntry dropDownItem) {
+                return dropDownItem.value == feature;
+              }));
+              limitedFeatures.addAll(openFeatures);
+
+              return Row(children: [
+                DropdownMenu(
+                  dropdownMenuEntries: limitedFeatures,
+                  width: 350,
+                  label: const Text("Kompetenz und Eigenschaft auswählen"),
+                  initialSelection: feature,
+                  onSelected: (dynamic newKey) {
+                    onSelected(newKey as String, value, feature);
+                  },
+                ),
+                SizedBox(
+                  width: padding,
+                ),
+                Text("Gewichtung:"),
+                SizedBox(
+                  width: padding / 2,
+                ),
+                SizedBox(
+                  width: 350,
+                  child: Slider(
+                      onChanged: (double newValue) {
+                        changeValue(newValue, feature);
+                      },
+                      value: value,
+                      min: -10,
+                      max: 10,
+                      divisions: 21,
+                      label: value.round().toString()),
+                ),
+                SizedBox(
+                  width: padding / 2,
+                ),
+                Tooltip(
+                  message: "Kompetenz und Eigenschaft löschen",
+                  child: IconButton(
+                      onPressed: () {
+                        deleteFeature(feature);
+                      },
+                      icon: Icon(Icons.delete_forever)),
+                ),
+              ]);
+            }
+
+            Column weightedFeatureColumn = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [],
+            );
+
+            for (String feature in weightedFeatures.keys) {
+              weightedFeatureColumn.children.add(
+                  createFeature(feature, weightedFeatures[feature]!,
+                      (String newKey, double newValue, String oldKey) {
+                weightedFeatures.remove(oldKey);
+                weightedFeatures[newKey] = newValue;
+                updateView();
+              }, (double newValue, String key) {
+                weightedFeatures[key] = newValue;
+                updateView();
+              }, (String key) {
+                weightedFeatures.remove(key);
+                updateView();
+              }));
+              weightedFeatureColumn.children.add(SizedBox(
+                height: padding,
+              ));
+            }
+
+            if (openFeatures.isNotEmpty) {
+              weightedFeatureColumn.children.add(ElevatedButton(
+                  onPressed: () {
+                    weightedFeatureColumn.children.insert(
+                        weightedFeatureColumn.children.length - 2,
+                        createFeature(openFeatures[0].value, 0,
+                            (String newKey, double newValue, String oldKey) {
+                          weightedFeatures.remove(oldKey);
+                          weightedFeatures[newKey] = newValue;
+                          updateView();
+                        }, (double newValue, String key) {
+                          weightedFeatures[key] = newValue;
+                          updateView();
+                        }, (String key) {
+                          weightedFeatures.remove(key);
+                          updateView();
+                        }));
+                    weightedFeatures[openFeatures[0].value] = 0;
+                    updateView();
+                  },
+                  child: const Text("Kompetenz und Eigenschaft hinzufügen")));
+            }
+
+            return weightedFeatureColumn;
+          }),
     ]);
   }
 }

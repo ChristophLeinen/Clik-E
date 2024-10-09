@@ -40,7 +40,7 @@ class EvaluationForm extends DataObject {
     final modificationDate = DateTime.parse((parsedData["modificationDate"]));
     List<Section> sections = [];
     final parsedSections = parsedData["sections"];
-    for (var i = 0; i < parsedSections.length; ++i) {
+    for (int i = 0; i < parsedSections.length; ++i) {
       sections.add(Section.fromJson(parsedSections[i]));
     }
     final suggestions = List<String>.from(parsedData["suggestions"]);
@@ -92,7 +92,7 @@ class EvaluationForm extends DataObject {
   }
 
   @override
-  Widget getEditControls() {
+  Widget getEditControls(Function updateView) {
     final TextEditingController idController = TextEditingController();
     final TextEditingController nameController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -235,7 +235,7 @@ class EvaluationForm extends DataObject {
               sectionController.text = section.label;
 
               List<Widget> generatedQuestions = [];
-              for (var questionIndex = 0;
+              for (int questionIndex = 0;
                   questionIndex < section.questions.length;
                   ++questionIndex) {
                 generatedQuestions
@@ -296,7 +296,7 @@ class EvaluationForm extends DataObject {
             }
 
             List<Widget> generatedSections = [];
-            for (var sectionIndex = 0;
+            for (int sectionIndex = 0;
                 sectionIndex < sections.length;
                 ++sectionIndex) {
               generatedSections.add(createSection(sections[sectionIndex]));
@@ -361,7 +361,7 @@ class EvaluationForm extends DataObject {
               children: [],
             );
 
-            for (var suggestionIndex = 0;
+            for (int suggestionIndex = 0;
                 suggestionIndex < suggestions.length;
                 ++suggestionIndex) {
               innerSuggestionColumn.children

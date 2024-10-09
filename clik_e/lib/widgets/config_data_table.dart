@@ -5,7 +5,7 @@ Widget _ConfigurationDataTableHeader(
     {required String title, Map<String, Function()?>? actions}) {
   List<Widget> actionRowItems = [];
   if (actions != null) {
-    for (var key in actions.keys) {
+    for (String key in actions.keys) {
       actionRowItems
           .add(ElevatedButton(onPressed: actions[key], child: Text(key)));
       actionRowItems.add(const SizedBox(width: 8));
@@ -46,7 +46,7 @@ class _ConfigurationDataTableState<T extends DataObject>
 
   List<DataRow> _createDataTableRows(List<DataObject> items) {
     final List<DataRow> tableRows = [];
-    for (var i = 0; i < items.length; i++) {
+    for (int i = 0; i < items.length; ++i) {
       void onTap() {
         setState(() {
           selectedItem = selectedItem == i ? -1 : i;

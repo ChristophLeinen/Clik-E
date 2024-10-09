@@ -31,7 +31,7 @@ class DataObject {
     return const [DataColumn(label: Text("ID"))];
   }
 
-  Widget getEditControls() {
+  Widget getEditControls(Function updateView) {
     final TextEditingController idController = TextEditingController();
     idController.text = id;
 

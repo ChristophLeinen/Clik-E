@@ -66,7 +66,7 @@ class Question extends DataObject {
   }
 
   @override
-  Widget getEditControls() {
+  Widget getEditControls(Function updateView) {
     final TextEditingController idController = TextEditingController();
     final TextEditingController questionController = TextEditingController();
     final TextEditingController featureController = TextEditingController();

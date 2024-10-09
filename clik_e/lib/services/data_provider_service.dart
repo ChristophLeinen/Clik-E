@@ -15,7 +15,7 @@ class DataService<T extends DataObject> {
   Future<T> getItem(String objectType, String id) async {
     List<T> items = await getItems(objectType);
 
-    for (var i = 0; i < items.length; i++) {
+    for (int i = 0; i < items.length; ++i) {
       if (items[i].id == id) {
         return items[i];
       }
@@ -33,7 +33,7 @@ class DataService<T extends DataObject> {
 
     List<T> items = [];
 
-    for (var i = 0; i < parsedItems.length; ++i) {
+    for (int i = 0; i < parsedItems.length; ++i) {
       if (objectType == "forms") {
         items.add(EvaluationForm.fromJson(parsedItems[i]) as T);
       } else if (objectType == "questions") {

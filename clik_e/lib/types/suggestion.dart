@@ -58,7 +58,7 @@ class Suggestion extends DataObject {
   }
 
   @override
-  Widget getEditControls() {
+  Widget getEditControls(Function updateView) {
     final TextEditingController idController = TextEditingController();
     final TextEditingController nameController = TextEditingController();
     final TextEditingController suggestionsInstructionsController =

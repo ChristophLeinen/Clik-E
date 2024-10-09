@@ -5,7 +5,7 @@ Widget _ConfigTableHeader(
     {required String title, Map<String, Function()?>? actions}) {
   List<Widget> actionRowItems = [];
   if (actions != null) {
-    for (var key in actions.keys) {
+    for (String key in actions.keys) {
       actionRowItems
           .add(ElevatedButton(onPressed: actions[key], child: Text(key)));
       actionRowItems.add(const SizedBox(width: 8));
@@ -32,7 +32,7 @@ TableRow _createTableColumnHeaders(List<dynamic> columnNames, bool withRadio) {
             height: 32, padding: const EdgeInsetsDirectional.only(start: 8))));
   }
 
-  for (var i = 0; i < columnNames.length; i++) {
+  for (int i = 0; i < columnNames.length; ++i) {
     columnHeaders.add(TableCell(
         verticalAlignment: TableCellVerticalAlignment.middle,
         child: Container(
@@ -80,7 +80,7 @@ class _ConfigurationTableState extends State<ConfigurationTable> {
   List<TableRow> _createTableRows(List<dynamic> rawData, bool withRadio) {
     final List<TableRow> tableRows = [];
 
-    for (var i = 0; i < rawData.length; i++) {
+    for (int i = 0; i < rawData.length; ++i) {
       final dataRow = rawData[i];
       final List<TableCell> properties = [];
 
@@ -104,7 +104,7 @@ class _ConfigurationTableState extends State<ConfigurationTable> {
                         ))))));
       }
 
-      for (var key in dataRow.keys) {
+      for (String key in dataRow.keys) {
         properties.add(TableCell(
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Expanded(

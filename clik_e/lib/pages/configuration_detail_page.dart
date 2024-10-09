@@ -45,7 +45,7 @@ Future<DataObject> getNewObject(String viewName) async {
   } else if (viewName == "suggestions") {
     newObject = Suggestion(newId, "", "", "", "");
   } else if (viewName == "logics") {
-    newObject = Logic(newId, "", "");
+    newObject = Logic(newId, "", {});
   }
 
   return newObject;
@@ -159,7 +159,9 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
                 }
 
                 return Column(children: [
-                  snapshot.data!.getEditControls(),
+                  snapshot.data!.getEditControls(() {
+                    setState(() {});
+                  }),
                   const SizedBox(height: padding),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     ElevatedButton(

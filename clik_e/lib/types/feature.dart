@@ -42,7 +42,7 @@ class Feature extends DataObject {
   }
 
   @override
-  Widget getEditControls() {
+  Widget getEditControls(Function updateView) {
     final TextEditingController idController = TextEditingController();
     final TextEditingController nameController = TextEditingController();
     idController.text = id;
