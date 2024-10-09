@@ -8,42 +8,43 @@ import 'package:intl/intl.dart';
 final DateFormat formatter = DateFormat("dd.MM.yyyy HH:mm");
 
 class Section {
-  const Section(this.label, this.questions);
+  Section(this.label, this.questions);
 
-  final String label;
-  final List<String> questions;
+  String label;
+  List<String> questions;
 
   factory Section.fromJson(dynamic parsedData) {
-    final label = parsedData["label"] as String;
-    final questions = List<String>.from(parsedData["questions"]);
+    String label = parsedData["label"];
+    List<String> questions = List<String>.from(parsedData["questions"]);
     return Section(label, questions);
   }
 }
 
 class EvaluationForm extends DataObject {
-  const EvaluationForm(id, this.name, this.description, this.creationDate,
+  EvaluationForm(id, this.name, this.description, this.creationDate,
       this.modificationDate, this.sections, this.suggestions)
       : super(id);
 
-  final String name;
-  final String description;
+  String name;
+  String description;
   final DateTime creationDate;
   final DateTime modificationDate;
-  final List<Section> sections;
-  final List<String> suggestions;
+  List<Section> sections;
+  List<String> suggestions;
 
   factory EvaluationForm.fromJson(dynamic parsedData) {
-    final id = parsedData["id"] as String;
-    final name = parsedData["name"] as String;
-    final description = parsedData["description"] as String;
-    final creationDate = DateTime.parse((parsedData["creationDate"]));
-    final modificationDate = DateTime.parse((parsedData["modificationDate"]));
+    final String id = parsedData["id"];
+    String name = parsedData["name"];
+    String description = parsedData["description"];
+    final DateTime creationDate = DateTime.parse((parsedData["creationDate"]));
+    final DateTime modificationDate =
+        DateTime.parse((parsedData["modificationDate"]));
     List<Section> sections = [];
-    final parsedSections = parsedData["sections"];
+    List<dynamic> parsedSections = parsedData["sections"];
     for (int i = 0; i < parsedSections.length; ++i) {
       sections.add(Section.fromJson(parsedSections[i]));
     }
-    final suggestions = List<String>.from(parsedData["suggestions"]);
+    List<String> suggestions = List<String>.from(parsedData["suggestions"]);
     return EvaluationForm(id, name, description, creationDate, modificationDate,
         sections, suggestions);
   }
@@ -139,6 +140,9 @@ class EvaluationForm extends DataObject {
         width: 500,
         child: TextField(
           controller: nameController,
+          onChanged: (String newValue) {
+            name = newValue;
+          },
         ),
       ),
       const SizedBox(
@@ -152,6 +156,9 @@ class EvaluationForm extends DataObject {
         width: 500,
         child: TextField(
           controller: descriptionController,
+          onChanged: (String newValue) {
+            description = newValue;
+          },
         ),
       ),
       const SizedBox(
@@ -208,7 +215,11 @@ class EvaluationForm extends DataObject {
                   label: snapshot.data![i].question));
             }
 
-            Row createQuestion(String question) {
+            Row createQuestion(
+              String question,
+              Function(String newQuestionId) onSelectQuestion,
+              Function() onDeleteQuestion,
+            ) {
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -217,6 +228,9 @@ class EvaluationForm extends DataObject {
                       width: 500,
                       label: const Text("Frage auswählen"),
                       initialSelection: question,
+                      onSelected: (dynamic newQuestionId) {
+                        onSelectQuestion(newQuestionId as String);
+                      },
                     ),
                     SizedBox(
                       width: padding,
@@ -224,12 +238,21 @@ class EvaluationForm extends DataObject {
                     Tooltip(
                       message: "Frage löschen",
                       child: IconButton(
-                          onPressed: () {}, icon: Icon(Icons.delete_forever)),
+                          onPressed: onDeleteQuestion,
+                          icon: Icon(Icons.delete_forever)),
                     ),
                   ]);
             }
 
-            Container createSection(Section section) {
+            Container createSection(
+              Section section,
+              Function(String newValue) onChangeSectionName,
+              Function() onDeleteSection,
+              Function() onAddQuestion,
+              Function(String newQuestionId, int questionIndex)
+                  onSelectQuestion,
+              Function(int questionIndex) onDeleteQuestion,
+            ) {
               final TextEditingController sectionController =
                   TextEditingController();
               sectionController.text = section.label;
@@ -238,8 +261,12 @@ class EvaluationForm extends DataObject {
               for (int questionIndex = 0;
                   questionIndex < section.questions.length;
                   ++questionIndex) {
-                generatedQuestions
-                    .add(createQuestion(section.questions[questionIndex]));
+                generatedQuestions.add(createQuestion(
+                    section.questions[questionIndex], (String newQuestionId) {
+                  onSelectQuestion(newQuestionId, questionIndex);
+                }, () {
+                  onDeleteQuestion(questionIndex);
+                }));
                 generatedQuestions.add(SizedBox(
                   height: padding,
                 ));
@@ -260,12 +287,13 @@ class EvaluationForm extends DataObject {
                               width: 250,
                               child: TextField(
                                 controller: sectionController,
+                                onChanged: onChangeSectionName,
                               ))
                         ]),
                         Tooltip(
                           message: "Gruppe löschen",
                           child: IconButton(
-                              onPressed: () {},
+                              onPressed: onDeleteSection,
                               icon: Icon(Icons.delete_forever)),
                         ),
                       ]),
@@ -281,7 +309,8 @@ class EvaluationForm extends DataObject {
 
               innerColumn.children.addAll(generatedQuestions);
               innerColumn.children.add(ElevatedButton(
-                  onPressed: () {}, child: const Text("Frage hinzufügen")));
+                  onPressed: onAddQuestion,
+                  child: const Text("Frage hinzufügen")));
 
               return Container(
                   padding: const EdgeInsets.symmetric(
@@ -299,14 +328,34 @@ class EvaluationForm extends DataObject {
             for (int sectionIndex = 0;
                 sectionIndex < sections.length;
                 ++sectionIndex) {
-              generatedSections.add(createSection(sections[sectionIndex]));
+              generatedSections
+                  .add(createSection(sections[sectionIndex], (String newValue) {
+                sections[sectionIndex].label = newValue;
+              }, () {
+                sections.remove(sections[sectionIndex]);
+                updateView();
+              }, () {
+                sections[sectionIndex].questions.add("");
+                updateView();
+              }, (String newQuestionId, int questionIndex) {
+                sections[sectionIndex].questions[questionIndex] = newQuestionId;
+              }, (int questionIndex) {
+                sections[sectionIndex]
+                    .questions
+                    .remove(sections[sectionIndex].questions[questionIndex]);
+                updateView();
+              }));
               generatedSections.add(SizedBox(
                 height: padding,
               ));
             }
 
             generatedSections.add(ElevatedButton(
-                onPressed: () {}, child: const Text("Gruppe hinzufügen")));
+                onPressed: () {
+                  sections.add(Section("", []));
+                  updateView();
+                },
+                child: const Text("Gruppe hinzufügen")));
 
             return Column(children: generatedSections);
           }),
@@ -328,22 +377,43 @@ class EvaluationForm extends DataObject {
               return const Text("Vorschläge konnten nicht geladen werden.");
             }
 
-            List<DropdownMenuEntry> allSuggestion = [];
+            List<DropdownMenuEntry> allSuggestions = [];
+            List<DropdownMenuEntry> openSuggestions = [];
 
             for (int i = 0; i < snapshot.data!.length; ++i) {
-              allSuggestion.add(DropdownMenuEntry(
+              if (!suggestions.contains(snapshot.data![i].id)) {
+                openSuggestions.add(DropdownMenuEntry(
+                    value: snapshot.data![i].id,
+                    label: snapshot.data![i].name));
+              }
+              allSuggestions.add(DropdownMenuEntry(
                   value: snapshot.data![i].id, label: snapshot.data![i].name));
             }
 
-            Row createSuggestion(String suggestion) {
+            Row createSuggestion(
+              String suggestion,
+              Function(String newValue) onSelectSuggestion,
+              Function() onDeleteSuggestion,
+            ) {
+              List<DropdownMenuEntry> limitedSuggestions = [];
+
+              limitedSuggestions.add(
+                  allSuggestions.firstWhere((DropdownMenuEntry dropDownItem) {
+                return dropDownItem.value == suggestion;
+              }));
+              limitedSuggestions.addAll(openSuggestions);
+
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DropdownMenu(
-                      dropdownMenuEntries: allSuggestion,
+                      dropdownMenuEntries: limitedSuggestions,
                       width: 500,
                       label: const Text("Vorschlag auswählen"),
                       initialSelection: suggestion,
+                      onSelected: (dynamic newValue) {
+                        onSelectSuggestion(newValue as String);
+                      },
                     ),
                     SizedBox(
                       width: padding,
@@ -351,7 +421,8 @@ class EvaluationForm extends DataObject {
                     Tooltip(
                       message: "Vorschlag löschen",
                       child: IconButton(
-                          onPressed: () {}, icon: Icon(Icons.delete_forever)),
+                          onPressed: onDeleteSuggestion,
+                          icon: Icon(Icons.delete_forever)),
                     ),
                   ]);
             }
@@ -364,15 +435,26 @@ class EvaluationForm extends DataObject {
             for (int suggestionIndex = 0;
                 suggestionIndex < suggestions.length;
                 ++suggestionIndex) {
-              innerSuggestionColumn.children
-                  .add(createSuggestion(suggestions[suggestionIndex]));
+              innerSuggestionColumn.children.add(createSuggestion(
+                  suggestions[suggestionIndex], (String newValue) {
+                suggestions[suggestionIndex] = newValue;
+              }, () {
+                suggestions.remove(suggestions[suggestionIndex]);
+                updateView();
+              }));
               innerSuggestionColumn.children.add(SizedBox(
                 height: padding,
               ));
             }
 
-            innerSuggestionColumn.children.add(ElevatedButton(
-                onPressed: () {}, child: const Text("Vorschlag hinzufügen")));
+            if (openSuggestions.isNotEmpty) {
+              innerSuggestionColumn.children.add(ElevatedButton(
+                  onPressed: () {
+                    suggestions.add(openSuggestions[0].value);
+                    updateView();
+                  },
+                  child: const Text("Vorschlag hinzufügen")));
+            }
 
             return Container(
               padding: const EdgeInsets.symmetric(
