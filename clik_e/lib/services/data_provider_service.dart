@@ -5,7 +5,12 @@ import 'package:clik_e/types/feature.dart';
 import 'package:clik_e/types/logic.dart';
 import 'package:clik_e/types/question.dart';
 import 'package:clik_e/types/suggestion.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+const String urlEndPoint = "http://127.0.0.1:3000/api/";
+bool noConnection = false;
 
 class DataService<T extends DataObject> {
   Future<List<T>> getItems(String objectType) async {
@@ -24,9 +29,74 @@ class DataService<T extends DataObject> {
     return items[-1];
   }
 
+  Future<bool> addItem(String objectType, T dataObject) async {
+    final response = await http.post(
+      Uri.parse("${urlEndPoint}addItem"),
+      body: {
+        objectType: objectType,
+        dataObject: dataObject,
+      },
+    );
+
+    return response.statusCode == 201;
+  }
+
+  Future<bool> changeItem(String objectType, T dataObject) async {
+    final response = await http.post(
+      Uri.parse("${urlEndPoint}changeItem"),
+      body: {
+        objectType: objectType,
+        dataObject: dataObject,
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> removeItem(String objectType, String id) async {
+    final response = await http.post(
+      Uri.parse("${urlEndPoint}removeItem"),
+      body: {
+        objectType: objectType,
+        id: id,
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
   loadData(String objectType) async {
-    final String sRawData =
-        await rootBundle.loadString("lib/database/rawdata_$objectType.json");
+    String sRawData;
+    if (noConnection) {
+      sRawData =
+          await rootBundle.loadString("lib/database/rawdata_$objectType.json");
+    } else {
+      try {
+        final response = await http.get(Uri.parse("$urlEndPoint$objectType"));
+
+        if (response.statusCode != 200) {
+          debugPrint(
+              "!!! Failed to load data from server! getting local data instead!");
+          String resBody = response.body;
+          int resStatusCode = response.statusCode;
+          debugPrint("body: $resBody");
+          debugPrint("statusCode: $resStatusCode");
+
+          sRawData = await rootBundle
+              .loadString("lib/database/rawdata_$objectType.json");
+          noConnection = true;
+        } else {
+          sRawData = response.body;
+        }
+      } catch (exception) {
+        debugPrint("exception: $exception");
+        debugPrint(
+            "!!! Failed to load data from server! getting local data instead!");
+        sRawData = await rootBundle
+            .loadString("lib/database/rawdata_$objectType.json");
+        noConnection = true;
+      }
+    }
 
     final Map<String, dynamic> parsedJson = json.decode(sRawData);
     final parsedItems = List<dynamic>.from(parsedJson["items"]);

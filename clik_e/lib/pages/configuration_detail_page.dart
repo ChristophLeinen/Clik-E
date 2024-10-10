@@ -33,7 +33,7 @@ Future<BackendData> getBackendData(
   return BackendData(dataObject, relatedObjects);
 }
 
-Future<DataObject> getDataObject(String viewName, String id) async {
+DataService getDataService(String viewName) {
   DataService dataService = DataService<DataObject>();
 
   if (viewName == "forms") {
@@ -50,6 +50,11 @@ Future<DataObject> getDataObject(String viewName, String id) async {
     dataService = DataService<DataObject>();
   }
 
+  return dataService;
+}
+
+Future<DataObject> getDataObject(String viewName, String id) async {
+  DataService dataService = getDataService(viewName);
   return await dataService.getItem(viewName, id);
 }
 
@@ -193,7 +198,24 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async {
+                                  DataService dataService =
+                                      getDataService(widget.viewName);
+                                  try {
+                                    if (widget.newObject) {
+                                      await dataService.addItem(
+                                        widget.viewName,
+                                        snapshot.data!.dataObject,
+                                      );
+                                    } else {
+                                      await dataService.changeItem(
+                                        widget.viewName,
+                                        snapshot.data!.dataObject,
+                                      );
+                                    }
+                                  } catch (exception) {
+                                    debugPrint("exception: $exception");
+                                  }
                                   Navigator.pop(context);
                                 },
                                 child: Text("Speichern")),

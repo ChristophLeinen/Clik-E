@@ -37,29 +37,29 @@ class _ConfigurationOverviewPageState extends State<ConfigurationOverviewPage> {
     _backendData = getBackendData(widget.viewName);
   }
 
-  Future<BackendData> getBackendData(String viewName) async {
-    List<DataObject> items = [];
+  DataService getDataService(String viewName) {
+    DataService dataService = DataService<DataObject>();
 
     if (viewName == "forms") {
-      final dataService = DataService<EvaluationForm>();
-      items = await dataService.getItems(viewName);
+      dataService = DataService<EvaluationForm>();
     } else if (viewName == "questions") {
-      final dataService = DataService<Question>();
-      items = await dataService.getItems(viewName);
+      dataService = DataService<Question>();
     } else if (viewName == "features") {
-      final dataService = DataService<Feature>();
-      items = await dataService.getItems(viewName);
+      dataService = DataService<Feature>();
     } else if (viewName == "suggestions") {
-      final dataService = DataService<Suggestion>();
-      items = await dataService.getItems(viewName);
+      dataService = DataService<Suggestion>();
     } else if (viewName == "logics") {
-      final dataService = DataService<Logic>();
-      items = await dataService.getItems(viewName);
+      dataService = DataService<Logic>();
     } else {
-      final dataService = DataService<DataObject>();
-      items = await dataService.getItems(viewName);
+      dataService = DataService<DataObject>();
     }
 
+    return dataService;
+  }
+
+  Future<BackendData> getBackendData(String viewName) async {
+    DataService dataService = getDataService(viewName);
+    List<DataObject> items = await dataService.getItems(viewName);
     return BackendData(items);
   }
 
@@ -129,9 +129,15 @@ class _ConfigurationOverviewPageState extends State<ConfigurationOverviewPage> {
                           ),
                         );
                       },
-                      onDeleteRow: (int rowNumber) {
-                        debugPrint("Not Implemented yet!");
-                        debugPrint("rowNumber: $rowNumber");
+                      onDeleteRow: (int rowNumber) async {
+                        DataService dataService =
+                            getDataService(widget.viewName);
+                        try {
+                          await dataService.removeItem(widget.viewName,
+                              snapshot.data!.items[rowNumber].id);
+                        } catch (exception) {
+                          debugPrint("$exception");
+                        }
                       },
                       onEditRow: (int rowNumber) {
                         Navigator.of(context).push(
