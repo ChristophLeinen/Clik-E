@@ -4,15 +4,15 @@ import 'package:clik_e/types/feature.dart';
 import 'package:flutter/material.dart';
 
 class Question extends DataObject {
-  const Question(id, this.question, this.feature) : super(id);
+  Question(super.id, this.question, this.feature);
 
-  final String question;
-  final String feature;
+  String question;
+  String feature;
 
   factory Question.fromJson(dynamic parsedData) {
-    final id = parsedData["id"] as String;
-    final question = parsedData["question"] as String;
-    final feature = parsedData["feature"] as String;
+    final String id = parsedData["id"];
+    String question = parsedData["question"];
+    String feature = parsedData["feature"];
     return Question(id, question, feature);
   }
 

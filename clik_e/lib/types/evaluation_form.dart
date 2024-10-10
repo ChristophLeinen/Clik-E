@@ -21,9 +21,8 @@ class Section {
 }
 
 class EvaluationForm extends DataObject {
-  EvaluationForm(id, this.name, this.description, this.creationDate,
-      this.modificationDate, this.sections, this.suggestions)
-      : super(id);
+  EvaluationForm(super.id, this.name, this.description, this.creationDate,
+      this.modificationDate, this.sections, this.suggestions);
 
   String name;
   String description;
@@ -217,7 +216,7 @@ class EvaluationForm extends DataObject {
           decoration: BoxDecoration(
             border: Border.all(width: 1, color: Colors.black),
           ),
-          width: 800,
+          width: 650,
           child: innerColumn);
     }
 
@@ -300,7 +299,7 @@ class EvaluationForm extends DataObject {
       ]);
     }
 
-    Column innerSuggestionColumn = Column(
+    Column suggestionColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [],
     );
@@ -308,7 +307,7 @@ class EvaluationForm extends DataObject {
     for (int suggestionIndex = 0;
         suggestionIndex < suggestions.length;
         ++suggestionIndex) {
-      innerSuggestionColumn.children.add(
+      suggestionColumn.children.add(
           createSuggestion(suggestions[suggestionIndex], (String newValue) {
         suggestions[suggestionIndex] = newValue;
         updateView();
@@ -316,13 +315,13 @@ class EvaluationForm extends DataObject {
         suggestions.remove(suggestions[suggestionIndex]);
         updateView();
       }));
-      innerSuggestionColumn.children.add(SizedBox(
+      suggestionColumn.children.add(SizedBox(
         height: padding,
       ));
     }
 
     if (openSuggestions.isNotEmpty) {
-      innerSuggestionColumn.children.add(ElevatedButton(
+      suggestionColumn.children.add(ElevatedButton(
           onPressed: () {
             suggestions.add(openSuggestions[0].value);
             updateView();
@@ -417,17 +416,7 @@ class EvaluationForm extends DataObject {
       const SizedBox(
         height: padding / 2,
       ),
-      Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: padding / 2,
-          vertical: padding / 2,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Colors.black),
-        ),
-        width: 800,
-        child: innerSuggestionColumn,
-      ),
+      suggestionColumn
     ]);
   }
 

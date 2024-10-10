@@ -1,25 +1,28 @@
+import 'package:clik_e/services/data_provider_service.dart';
 import 'package:clik_e/types/data_object.dart';
+import 'package:clik_e/types/logic.dart';
 import 'package:flutter/material.dart';
 
 class Suggestion extends DataObject {
-  const Suggestion(id, this.name, this.suggestionsInstructions,
-      this.expertExplanation, this.expertReasoning)
-      : super(id);
+  Suggestion(super.id, this.name, this.suggestionsInstructions,
+      this.expertExplanation, this.expertReasoning, this.connectedLogics);
 
-  final String name;
-  final String suggestionsInstructions;
-  final String expertExplanation;
-  final String expertReasoning;
+  String name;
+  String suggestionsInstructions;
+  String expertExplanation;
+  String expertReasoning;
+  List<String> connectedLogics;
 
   factory Suggestion.fromJson(dynamic parsedData) {
-    final id = parsedData["id"] as String;
-    final name = parsedData["name"] as String;
-    final suggestionsInstructions =
-        parsedData["suggestionsInstructions"] as String;
-    final expertExplanation = parsedData["expertExplanation"] as String;
-    final expertReasoning = parsedData["expertReasoning"] as String;
-    return Suggestion(
-        id, name, suggestionsInstructions, expertExplanation, expertReasoning);
+    final String id = parsedData["id"];
+    String name = parsedData["name"];
+    String suggestionsInstructions = parsedData["suggestionsInstructions"];
+    String expertExplanation = parsedData["expertExplanation"];
+    String expertReasoning = parsedData["expertReasoning"];
+    List<String> connectedLogics =
+        List<String>.from(parsedData["connectedLogics"]);
+    return Suggestion(id, name, suggestionsInstructions, expertExplanation,
+        expertReasoning, connectedLogics);
   }
 
   @override
@@ -27,6 +30,8 @@ class Suggestion extends DataObject {
     void pressed() {
       onTap(position);
     }
+
+    int connectedLogicsLength = connectedLogics.length;
 
     return DataRow(
         color:
@@ -41,8 +46,7 @@ class Suggestion extends DataObject {
           DataCell(Text(id), onTap: pressed),
           DataCell(Text(name), onTap: pressed),
           DataCell(Text(suggestionsInstructions), onTap: pressed),
-          DataCell(Text(expertExplanation), onTap: pressed),
-          DataCell(Text(expertReasoning), onTap: pressed),
+          DataCell(Text("$connectedLogicsLength"), onTap: pressed),
         ]);
   }
 
@@ -52,8 +56,7 @@ class Suggestion extends DataObject {
       DataColumn(label: Text("ID")),
       DataColumn(label: Text("Name")),
       DataColumn(label: Text("Vorschlagsanweisung")),
-      DataColumn(label: Text("Didaktische Erläuterung")),
-      DataColumn(label: Text("Didaktische Begründung")),
+      DataColumn(label: Text("Anzahl verbundener Regeln")),
     ];
   }
 
@@ -76,37 +79,173 @@ class Suggestion extends DataObject {
     expertExplanationController.text = expertExplanation;
     expertReasoningController.text = expertReasoning;
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+    const double padding = 16;
+
+    List<DropdownMenuEntry> allLogics = [];
+    List<DropdownMenuEntry> openLogics = [];
+
+    Logic logic;
+    for (int i = 0; i < relatedObjects["logics"]!.length; ++i) {
+      logic = relatedObjects["logics"]![i] as Logic;
+      if (!connectedLogics.contains(logic.id)) {
+        openLogics.add(DropdownMenuEntry(value: logic.id, label: logic.name));
+      }
+      allLogics.add(DropdownMenuEntry(value: logic.id, label: logic.name));
+    }
+
+    Row createLogic(
+      String logic,
+      Function(String newValue) onSelectLogic,
+      Function() onDeleteLogic,
+    ) {
+      List<DropdownMenuEntry> limitedLogics = [];
+
+      limitedLogics.add(allLogics.firstWhere((DropdownMenuEntry dropDownItem) {
+        return dropDownItem.value == logic;
+      }));
+      limitedLogics.addAll(openLogics);
+
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        DropdownMenu(
+          dropdownMenuEntries: limitedLogics,
+          width: 500,
+          label: const Text("Regel auswählen"),
+          initialSelection: logic,
+          onSelected: (dynamic newValue) {
+            onSelectLogic(newValue as String);
+          },
+        ),
+        SizedBox(
+          width: padding,
+        ),
+        Tooltip(
+          message: "Regel löschen",
+          child: IconButton(
+              onPressed: onDeleteLogic, icon: Icon(Icons.delete_forever)),
+        ),
+      ]);
+    }
+
+    Column logicColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [],
+    );
+
+    for (int logicIndex = 0;
+        logicIndex < connectedLogics.length;
+        ++logicIndex) {
+      logicColumn.children
+          .add(createLogic(connectedLogics[logicIndex], (String newValue) {
+        connectedLogics[logicIndex] = newValue;
+        updateView();
+      }, () {
+        connectedLogics.remove(connectedLogics[logicIndex]);
+        updateView();
+      }));
+      logicColumn.children.add(SizedBox(
+        height: padding,
+      ));
+    }
+
+    if (openLogics.isNotEmpty) {
+      logicColumn.children.add(ElevatedButton(
+          onPressed: () {
+            connectedLogics.add(openLogics[0].value);
+            updateView();
+          },
+          child: const Text("Regel hinzufügen")));
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const Text("ID"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: idController,
-        enabled: false,
+      const SizedBox(
+        height: padding / 2,
       ),
-      const SizedBox(height: 16),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: idController,
+          enabled: false,
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
       const Text("Name"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: nameController,
+      const SizedBox(
+        height: padding / 2,
       ),
-      const SizedBox(height: 16),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: nameController,
+          onChanged: (String newValue) {
+            name = newValue;
+          },
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
       const Text("Vorschlagsanweisung"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: suggestionsInstructionsController,
+      const SizedBox(
+        height: padding / 2,
       ),
-      const SizedBox(height: 16),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: suggestionsInstructionsController,
+          onChanged: (String newValue) {
+            suggestionsInstructions = newValue;
+          },
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
       const Text("Didaktische Erläuterung"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: expertExplanationController,
+      const SizedBox(
+        height: padding / 2,
       ),
-      const SizedBox(height: 16),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: expertExplanationController,
+          onChanged: (String newValue) {
+            expertExplanation = newValue;
+          },
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
       const Text("Didaktische Begründung"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: expertReasoningController,
+      const SizedBox(
+        height: padding / 2,
       ),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: expertReasoningController,
+          onChanged: (String newValue) {
+            expertReasoning = newValue;
+          },
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
+      const Text("Regeln für diesen Vorschlag"),
+      const SizedBox(
+        height: padding,
+      ),
+      logicColumn,
     ]);
+  }
+
+  @override
+  Future<Map<String, List<DataObject>>> getRelatedItems() async {
+    List<Logic> logics = await DataService<Logic>().getItems("logics");
+    return {"logics": logics};
   }
 }

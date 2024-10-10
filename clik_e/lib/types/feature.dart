@@ -2,13 +2,13 @@ import 'package:clik_e/types/data_object.dart';
 import 'package:flutter/material.dart';
 
 class Feature extends DataObject {
-  const Feature(id, this.name) : super(id);
+  Feature(super.id, this.name);
 
-  final String name;
+  String name;
 
   factory Feature.fromJson(dynamic parsedData) {
-    final id = parsedData["id"] as String;
-    final name = parsedData["name"] as String;
+    final String id = parsedData["id"];
+    String name = parsedData["name"];
     return Feature(id, name);
   }
 
@@ -51,18 +51,34 @@ class Feature extends DataObject {
     idController.text = id;
     nameController.text = name;
 
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+    const double padding = 16;
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const Text("ID"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: idController,
-        enabled: false,
+      const SizedBox(
+        height: padding / 2,
       ),
-      const SizedBox(height: 16),
+      SizedBox(
+        width: 500,
+        child: TextField(
+          controller: idController,
+          enabled: false,
+        ),
+      ),
+      const SizedBox(
+        height: padding,
+      ),
       const Text("Name"),
-      const SizedBox(height: 8),
-      TextField(
-        controller: nameController,
+      const SizedBox(
+        height: padding / 2,
+      ),
+      SizedBox(
+        width: 500,
+        child: TextField(
+            controller: nameController,
+            onChanged: (String newValue) {
+              name = newValue;
+            }),
       ),
     ]);
   }

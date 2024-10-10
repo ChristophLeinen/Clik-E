@@ -4,13 +4,13 @@ import 'package:clik_e/types/feature.dart';
 import 'package:flutter/material.dart';
 
 class Logic extends DataObject {
-  Logic(id, this.name, this.weightedFeatures) : super(id);
+  Logic(super.id, this.name, this.weightedFeatures);
 
   String name;
   Map<String, double> weightedFeatures;
 
   factory Logic.fromJson(dynamic parsedData) {
-    String id = parsedData["id"];
+    final String id = parsedData["id"];
     String name = parsedData["name"];
     Map<String, double> weightedFeatures =
         Map<String, double>.from(parsedData["weightedFeatures"]);

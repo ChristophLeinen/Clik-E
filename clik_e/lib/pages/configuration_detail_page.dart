@@ -65,7 +65,7 @@ Future<DataObject> getNewObject(String viewName) async {
   } else if (viewName == "features") {
     newObject = Feature(newId, "");
   } else if (viewName == "suggestions") {
-    newObject = Suggestion(newId, "", "", "", "");
+    newObject = Suggestion(newId, "", "", "", "", []);
   } else if (viewName == "logics") {
     newObject = Logic(newId, "", {});
   }
@@ -97,7 +97,8 @@ Future<DataObject> getObjectCopy(String viewName, String id) async {
         oldObject.name,
         oldObject.suggestionsInstructions,
         oldObject.expertExplanation,
-        oldObject.expertReasoning);
+        oldObject.expertReasoning,
+        oldObject.connectedLogics);
   } else if (oldObject is Logic) {
     newObject = Logic(newId, oldObject.name, oldObject.weightedFeatures);
   }
@@ -178,28 +179,32 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
                   return const Text("Eintrag nicht gefunden.");
                 }
 
-                return Column(children: [
-                  snapshot.data!.dataObject.getEditControls(
-                    () {
-                      setState(() {});
-                    },
-                    snapshot.data!.relatedObjects,
-                  ),
-                  const SizedBox(height: padding),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
+                return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      snapshot.data!.dataObject.getEditControls(
+                        () {
+                          setState(() {});
                         },
-                        child: Text("Speichern")),
-                    const SizedBox(width: padding),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text("Abbrechen"))
-                  ])
-                ]);
+                        snapshot.data!.relatedObjects,
+                      ),
+                      const SizedBox(height: padding),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Speichern")),
+                            const SizedBox(width: padding),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Abbrechen"))
+                          ])
+                    ]);
               }),
         ),
       ),
