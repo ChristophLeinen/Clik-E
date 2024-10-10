@@ -55,7 +55,9 @@ class _AnalyzeSelectionPageState extends State<AnalyzeSelectionPage> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const AnalyzePage(),
+                          builder: (context) => const AnalyzePage(
+                            formId: "",
+                          ),
                         ),
                       );
                     },

@@ -285,6 +285,8 @@ class _EvaluationPageState2 extends State<EvaluationPage2> {
       });
     }
 
+    String formId = widget.formId;
+
     return Scaffold(
       appBar: CliKASAAppBar(
         title: "Evaluierung",
@@ -340,7 +342,9 @@ class _EvaluationPageState2 extends State<EvaluationPage2> {
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const AnalyzePage(),
+                                  builder: (context) => AnalyzePage(
+                                    formId: formId,
+                                  ),
                                 ),
                               );
                             },
