@@ -10,10 +10,10 @@ import 'package:flutter/widgets.dart';
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
 
-  final double padding = 15;
-
   @override
   Widget build(BuildContext context) {
+    const double padding = 16;
+
     return Scaffold(
       appBar: CliKASAAppBar(
         title: "Hauptmenü",

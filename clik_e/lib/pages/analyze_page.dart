@@ -101,7 +101,7 @@ class _AnalyzePageState extends State<AnalyzePage> {
 
   @override
   Widget build(BuildContext context) {
-    const double padding = 15;
+    const double padding = 16;
 
     return Scaffold(
       appBar: CliKASAAppBar(

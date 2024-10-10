@@ -50,7 +50,7 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    const double padding = 15;
+    const double padding = 16;
 
     return Scaffold(
       appBar: CliKASAAppBar(
@@ -58,8 +58,13 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          child: Center(
-            child: FutureBuilder(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(
+                "Diese Observationsbögen werden jeweils pro Schülerin und Schüler ausgeführt."),
+            SizedBox(
+              height: padding * 2,
+            ),
+            FutureBuilder(
                 future: _backendData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -161,7 +166,7 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
                             child: const Text("Evaluierung starten")),
                       ]);
                 }),
-          ),
+          ]),
         ),
       ),
     );

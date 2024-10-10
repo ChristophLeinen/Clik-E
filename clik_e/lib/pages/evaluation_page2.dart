@@ -271,7 +271,7 @@ class _EvaluationPageState2 extends State<EvaluationPage2> {
 
   @override
   Widget build(BuildContext context) {
-    const double padding = 15;
+    const double padding = 16;
 
     void valueChange(double value) {
       setState(() {
