@@ -31,7 +31,10 @@ class DataObject {
     return const [DataColumn(label: Text("ID"))];
   }
 
-  Widget getEditControls(Function updateView) {
+  Widget getEditControls(
+    Function updateView,
+    Map<String, List<DataObject>> relatedObjects,
+  ) {
     final TextEditingController idController = TextEditingController();
     idController.text = id;
 
@@ -43,5 +46,9 @@ class DataObject {
         enabled: false,
       ),
     ]);
+  }
+
+  Future<Map<String, List<DataObject>>> getRelatedItems() async {
+    return {};
   }
 }

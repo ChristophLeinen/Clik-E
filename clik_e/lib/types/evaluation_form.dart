@@ -93,7 +93,10 @@ class EvaluationForm extends DataObject {
   }
 
   @override
-  Widget getEditControls(Function updateView) {
+  Widget getEditControls(
+    Function updateView,
+    Map<String, List<DataObject>> relatedObjects,
+  ) {
     final TextEditingController idController = TextEditingController();
     final TextEditingController nameController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
@@ -107,15 +110,225 @@ class EvaluationForm extends DataObject {
     creationDateController.text = formatter.format(creationDate);
     modificationDateController.text = formatter.format(modificationDate);
 
-    Future<List<Question>> getAllQuestions() async {
-      return await DataService<Question>().getItems("questions");
-    }
-
-    Future<List<Suggestion>> getAllSuggestions() async {
-      return await DataService<Suggestion>().getItems("suggestions");
-    }
-
     const double padding = 16;
+
+    List<DropdownMenuEntry> allQuestions = [];
+    Question question;
+
+    for (int i = 0; i < relatedObjects["questions"]!.length; ++i) {
+      question = relatedObjects["questions"]![i] as Question;
+      allQuestions
+          .add(DropdownMenuEntry(value: question.id, label: question.question));
+    }
+
+    Row createQuestion(
+      String question,
+      Function(String newQuestionId) onSelectQuestion,
+      Function() onDeleteQuestion,
+    ) {
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        DropdownMenu(
+          dropdownMenuEntries: allQuestions,
+          width: 500,
+          label: const Text("Frage auswählen"),
+          initialSelection: question,
+          onSelected: (dynamic newQuestionId) {
+            onSelectQuestion(newQuestionId as String);
+          },
+        ),
+        SizedBox(
+          width: padding,
+        ),
+        Tooltip(
+          message: "Frage löschen",
+          child: IconButton(
+              onPressed: onDeleteQuestion, icon: Icon(Icons.delete_forever)),
+        ),
+      ]);
+    }
+
+    Container createSection(
+      Section section,
+      Function(String newValue) onChangeSectionName,
+      Function() onDeleteSection,
+      Function() onAddQuestion,
+      Function(String newQuestionId, int questionIndex) onSelectQuestion,
+      Function(int questionIndex) onDeleteQuestion,
+    ) {
+      final TextEditingController sectionController = TextEditingController();
+      sectionController.text = section.label;
+
+      List<Widget> generatedQuestions = [];
+      for (int questionIndex = 0;
+          questionIndex < section.questions.length;
+          ++questionIndex) {
+        generatedQuestions.add(createQuestion(section.questions[questionIndex],
+            (String newQuestionId) {
+          onSelectQuestion(newQuestionId, questionIndex);
+        }, () {
+          onDeleteQuestion(questionIndex);
+        }));
+        generatedQuestions.add(SizedBox(
+          height: padding,
+        ));
+      }
+
+      Column innerColumn = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(children: [
+              Text("Guppenname:"),
+              SizedBox(
+                width: padding,
+              ),
+              SizedBox(
+                  width: 250,
+                  child: TextField(
+                    controller: sectionController,
+                    onChanged: onChangeSectionName,
+                  ))
+            ]),
+            Tooltip(
+              message: "Gruppe löschen",
+              child: IconButton(
+                  onPressed: onDeleteSection, icon: Icon(Icons.delete_forever)),
+            ),
+          ]),
+          SizedBox(
+            height: padding,
+          ),
+          Text("Fragen:"),
+          SizedBox(
+            height: padding,
+          ),
+        ],
+      );
+
+      innerColumn.children.addAll(generatedQuestions);
+      innerColumn.children.add(ElevatedButton(
+          onPressed: onAddQuestion, child: const Text("Frage hinzufügen")));
+
+      return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: padding / 2,
+            vertical: padding / 2,
+          ),
+          decoration: BoxDecoration(
+            border: Border.all(width: 1, color: Colors.black),
+          ),
+          width: 800,
+          child: innerColumn);
+    }
+
+    List<Widget> generatedSections = [];
+    for (int sectionIndex = 0; sectionIndex < sections.length; ++sectionIndex) {
+      generatedSections
+          .add(createSection(sections[sectionIndex], (String newValue) {
+        sections[sectionIndex].label = newValue;
+      }, () {
+        sections.remove(sections[sectionIndex]);
+        updateView();
+      }, () {
+        sections[sectionIndex].questions.add("");
+        updateView();
+      }, (String newQuestionId, int questionIndex) {
+        sections[sectionIndex].questions[questionIndex] = newQuestionId;
+      }, (int questionIndex) {
+        sections[sectionIndex]
+            .questions
+            .remove(sections[sectionIndex].questions[questionIndex]);
+        updateView();
+      }));
+      generatedSections.add(SizedBox(
+        height: padding,
+      ));
+    }
+
+    generatedSections.add(ElevatedButton(
+        onPressed: () {
+          sections.add(Section("", []));
+          updateView();
+        },
+        child: const Text("Gruppe hinzufügen")));
+
+    List<DropdownMenuEntry> allSuggestions = [];
+    List<DropdownMenuEntry> openSuggestions = [];
+
+    Suggestion suggestion;
+    for (int i = 0; i < relatedObjects["suggestions"]!.length; ++i) {
+      suggestion = relatedObjects["suggestions"]![i] as Suggestion;
+      if (!suggestions.contains(suggestion.id)) {
+        openSuggestions.add(
+            DropdownMenuEntry(value: suggestion.id, label: suggestion.name));
+      }
+      allSuggestions
+          .add(DropdownMenuEntry(value: suggestion.id, label: suggestion.name));
+    }
+
+    Row createSuggestion(
+      String suggestion,
+      Function(String newValue) onSelectSuggestion,
+      Function() onDeleteSuggestion,
+    ) {
+      List<DropdownMenuEntry> limitedSuggestions = [];
+
+      limitedSuggestions
+          .add(allSuggestions.firstWhere((DropdownMenuEntry dropDownItem) {
+        return dropDownItem.value == suggestion;
+      }));
+      limitedSuggestions.addAll(openSuggestions);
+
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        DropdownMenu(
+          dropdownMenuEntries: limitedSuggestions,
+          width: 500,
+          label: const Text("Vorschlag auswählen"),
+          initialSelection: suggestion,
+          onSelected: (dynamic newValue) {
+            onSelectSuggestion(newValue as String);
+          },
+        ),
+        SizedBox(
+          width: padding,
+        ),
+        Tooltip(
+          message: "Vorschlag löschen",
+          child: IconButton(
+              onPressed: onDeleteSuggestion, icon: Icon(Icons.delete_forever)),
+        ),
+      ]);
+    }
+
+    Column innerSuggestionColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [],
+    );
+
+    for (int suggestionIndex = 0;
+        suggestionIndex < suggestions.length;
+        ++suggestionIndex) {
+      innerSuggestionColumn.children.add(
+          createSuggestion(suggestions[suggestionIndex], (String newValue) {
+        suggestions[suggestionIndex] = newValue;
+        updateView();
+      }, () {
+        suggestions.remove(suggestions[suggestionIndex]);
+        updateView();
+      }));
+      innerSuggestionColumn.children.add(SizedBox(
+        height: padding,
+      ));
+    }
+
+    if (openSuggestions.isNotEmpty) {
+      innerSuggestionColumn.children.add(ElevatedButton(
+          onPressed: () {
+            suggestions.add(openSuggestions[0].value);
+            updateView();
+          },
+          child: const Text("Vorschlag hinzufügen")));
+    }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       const Text("ID"),
@@ -196,169 +409,7 @@ class EvaluationForm extends DataObject {
       const SizedBox(
         height: padding / 2,
       ),
-      FutureBuilder(
-          future: getAllQuestions(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
-
-            if (snapshot.hasError || !snapshot.hasData) {
-              return const Text("Fragen konnten nicht geladen werden.");
-            }
-
-            List<DropdownMenuEntry> allQuestions = [];
-
-            for (int i = 0; i < snapshot.data!.length; ++i) {
-              allQuestions.add(DropdownMenuEntry(
-                  value: snapshot.data![i].id,
-                  label: snapshot.data![i].question));
-            }
-
-            Row createQuestion(
-              String question,
-              Function(String newQuestionId) onSelectQuestion,
-              Function() onDeleteQuestion,
-            ) {
-              return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DropdownMenu(
-                      dropdownMenuEntries: allQuestions,
-                      width: 500,
-                      label: const Text("Frage auswählen"),
-                      initialSelection: question,
-                      onSelected: (dynamic newQuestionId) {
-                        onSelectQuestion(newQuestionId as String);
-                      },
-                    ),
-                    SizedBox(
-                      width: padding,
-                    ),
-                    Tooltip(
-                      message: "Frage löschen",
-                      child: IconButton(
-                          onPressed: onDeleteQuestion,
-                          icon: Icon(Icons.delete_forever)),
-                    ),
-                  ]);
-            }
-
-            Container createSection(
-              Section section,
-              Function(String newValue) onChangeSectionName,
-              Function() onDeleteSection,
-              Function() onAddQuestion,
-              Function(String newQuestionId, int questionIndex)
-                  onSelectQuestion,
-              Function(int questionIndex) onDeleteQuestion,
-            ) {
-              final TextEditingController sectionController =
-                  TextEditingController();
-              sectionController.text = section.label;
-
-              List<Widget> generatedQuestions = [];
-              for (int questionIndex = 0;
-                  questionIndex < section.questions.length;
-                  ++questionIndex) {
-                generatedQuestions.add(createQuestion(
-                    section.questions[questionIndex], (String newQuestionId) {
-                  onSelectQuestion(newQuestionId, questionIndex);
-                }, () {
-                  onDeleteQuestion(questionIndex);
-                }));
-                generatedQuestions.add(SizedBox(
-                  height: padding,
-                ));
-              }
-
-              Column innerColumn = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(children: [
-                          Text("Guppenname:"),
-                          SizedBox(
-                            width: padding,
-                          ),
-                          SizedBox(
-                              width: 250,
-                              child: TextField(
-                                controller: sectionController,
-                                onChanged: onChangeSectionName,
-                              ))
-                        ]),
-                        Tooltip(
-                          message: "Gruppe löschen",
-                          child: IconButton(
-                              onPressed: onDeleteSection,
-                              icon: Icon(Icons.delete_forever)),
-                        ),
-                      ]),
-                  SizedBox(
-                    height: padding,
-                  ),
-                  Text("Fragen:"),
-                  SizedBox(
-                    height: padding,
-                  ),
-                ],
-              );
-
-              innerColumn.children.addAll(generatedQuestions);
-              innerColumn.children.add(ElevatedButton(
-                  onPressed: onAddQuestion,
-                  child: const Text("Frage hinzufügen")));
-
-              return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: padding / 2,
-                    vertical: padding / 2,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Colors.black),
-                  ),
-                  width: 800,
-                  child: innerColumn);
-            }
-
-            List<Widget> generatedSections = [];
-            for (int sectionIndex = 0;
-                sectionIndex < sections.length;
-                ++sectionIndex) {
-              generatedSections
-                  .add(createSection(sections[sectionIndex], (String newValue) {
-                sections[sectionIndex].label = newValue;
-              }, () {
-                sections.remove(sections[sectionIndex]);
-                updateView();
-              }, () {
-                sections[sectionIndex].questions.add("");
-                updateView();
-              }, (String newQuestionId, int questionIndex) {
-                sections[sectionIndex].questions[questionIndex] = newQuestionId;
-              }, (int questionIndex) {
-                sections[sectionIndex]
-                    .questions
-                    .remove(sections[sectionIndex].questions[questionIndex]);
-                updateView();
-              }));
-              generatedSections.add(SizedBox(
-                height: padding,
-              ));
-            }
-
-            generatedSections.add(ElevatedButton(
-                onPressed: () {
-                  sections.add(Section("", []));
-                  updateView();
-                },
-                child: const Text("Gruppe hinzufügen")));
-
-            return Column(children: generatedSections);
-          }),
+      Column(children: generatedSections),
       const SizedBox(
         height: padding,
       ),
@@ -366,108 +417,26 @@ class EvaluationForm extends DataObject {
       const SizedBox(
         height: padding / 2,
       ),
-      FutureBuilder(
-          future: getAllSuggestions(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            }
-
-            if (snapshot.hasError || !snapshot.hasData) {
-              return const Text("Vorschläge konnten nicht geladen werden.");
-            }
-
-            List<DropdownMenuEntry> allSuggestions = [];
-            List<DropdownMenuEntry> openSuggestions = [];
-
-            for (int i = 0; i < snapshot.data!.length; ++i) {
-              if (!suggestions.contains(snapshot.data![i].id)) {
-                openSuggestions.add(DropdownMenuEntry(
-                    value: snapshot.data![i].id,
-                    label: snapshot.data![i].name));
-              }
-              allSuggestions.add(DropdownMenuEntry(
-                  value: snapshot.data![i].id, label: snapshot.data![i].name));
-            }
-
-            Row createSuggestion(
-              String suggestion,
-              Function(String newValue) onSelectSuggestion,
-              Function() onDeleteSuggestion,
-            ) {
-              List<DropdownMenuEntry> limitedSuggestions = [];
-
-              limitedSuggestions.add(
-                  allSuggestions.firstWhere((DropdownMenuEntry dropDownItem) {
-                return dropDownItem.value == suggestion;
-              }));
-              limitedSuggestions.addAll(openSuggestions);
-
-              return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DropdownMenu(
-                      dropdownMenuEntries: limitedSuggestions,
-                      width: 500,
-                      label: const Text("Vorschlag auswählen"),
-                      initialSelection: suggestion,
-                      onSelected: (dynamic newValue) {
-                        onSelectSuggestion(newValue as String);
-                      },
-                    ),
-                    SizedBox(
-                      width: padding,
-                    ),
-                    Tooltip(
-                      message: "Vorschlag löschen",
-                      child: IconButton(
-                          onPressed: onDeleteSuggestion,
-                          icon: Icon(Icons.delete_forever)),
-                    ),
-                  ]);
-            }
-
-            Column innerSuggestionColumn = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [],
-            );
-
-            for (int suggestionIndex = 0;
-                suggestionIndex < suggestions.length;
-                ++suggestionIndex) {
-              innerSuggestionColumn.children.add(createSuggestion(
-                  suggestions[suggestionIndex], (String newValue) {
-                suggestions[suggestionIndex] = newValue;
-              }, () {
-                suggestions.remove(suggestions[suggestionIndex]);
-                updateView();
-              }));
-              innerSuggestionColumn.children.add(SizedBox(
-                height: padding,
-              ));
-            }
-
-            if (openSuggestions.isNotEmpty) {
-              innerSuggestionColumn.children.add(ElevatedButton(
-                  onPressed: () {
-                    suggestions.add(openSuggestions[0].value);
-                    updateView();
-                  },
-                  child: const Text("Vorschlag hinzufügen")));
-            }
-
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: padding / 2,
-                vertical: padding / 2,
-              ),
-              decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black),
-              ),
-              width: 800,
-              child: innerSuggestionColumn,
-            );
-          }),
+      Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: padding / 2,
+          vertical: padding / 2,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(width: 1, color: Colors.black),
+        ),
+        width: 800,
+        child: innerSuggestionColumn,
+      ),
     ]);
+  }
+
+  @override
+  Future<Map<String, List<DataObject>>> getRelatedItems() async {
+    List<Question> questions =
+        await DataService<Question>().getItems("questions");
+    List<Suggestion> suggestions =
+        await DataService<Suggestion>().getItems("suggestions");
+    return {"questions": questions, "suggestions": suggestions};
   }
 }

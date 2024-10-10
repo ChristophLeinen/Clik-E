@@ -11,7 +11,29 @@ import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
 
-Future<DataObject> getBackendData(String viewName, String id) async {
+Future<BackendData> getBackendData(
+    String viewName, bool newObject, String id) async {
+  DataObject dataObject;
+
+  if (newObject) {
+    if (id == "") {
+      // Create new Object
+      dataObject = await getNewObject(viewName);
+    } else {
+      // Copy an Object
+      dataObject = await getObjectCopy(viewName, id);
+    }
+  } else {
+    // Edit an Object
+    dataObject = await getDataObject(viewName, id);
+  }
+  Map<String, List<DataObject>> relatedObjects =
+      await dataObject.getRelatedItems();
+
+  return BackendData(dataObject, relatedObjects);
+}
+
+Future<DataObject> getDataObject(String viewName, String id) async {
   DataService dataService = DataService<DataObject>();
 
   if (viewName == "forms") {
@@ -53,7 +75,7 @@ Future<DataObject> getNewObject(String viewName) async {
 
 Future<DataObject> getObjectCopy(String viewName, String id) async {
   String newId = uuid.v1();
-  DataObject oldObject = await getBackendData(viewName, id);
+  DataObject oldObject = await getDataObject(viewName, id);
   DataObject newObject = DataObject(newId);
 
   if (oldObject is EvaluationForm) {
@@ -99,24 +121,21 @@ class ConfigurationDetailPage extends StatefulWidget {
       _ConfigurationDetailPageState();
 }
 
+class BackendData {
+  BackendData(this.dataObject, this.relatedObjects);
+
+  DataObject dataObject;
+  Map<String, List<DataObject>> relatedObjects;
+}
+
 class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
-  late Future<DataObject> _backendData;
+  late Future<BackendData> _backendData;
 
   @override
   void initState() {
     super.initState();
-    if (widget.newObject) {
-      if (widget.entityId == "") {
-        // Create new Object
-        _backendData = getNewObject(widget.viewName);
-      } else {
-        // Copy an Object
-        _backendData = getObjectCopy(widget.viewName, widget.entityId);
-      }
-    } else {
-      // Edit an Object
-      _backendData = getBackendData(widget.viewName, widget.entityId);
-    }
+    _backendData =
+        getBackendData(widget.viewName, widget.newObject, widget.entityId);
   }
 
   @override
@@ -134,13 +153,14 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
               future: _backendData,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                  return const Center(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                         CircularProgressIndicator(),
                         SizedBox(height: padding),
                         Text("Eintrag wird geladen.")
-                      ]);
+                      ]));
                 }
 
                 if (snapshot.hasError) {
@@ -159,9 +179,12 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
                 }
 
                 return Column(children: [
-                  snapshot.data!.getEditControls(() {
-                    setState(() {});
-                  }),
+                  snapshot.data!.dataObject.getEditControls(
+                    () {
+                      setState(() {});
+                    },
+                    snapshot.data!.relatedObjects,
+                  ),
                   const SizedBox(height: padding),
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     ElevatedButton(
