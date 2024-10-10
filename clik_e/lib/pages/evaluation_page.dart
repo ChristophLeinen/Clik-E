@@ -7,10 +7,17 @@ import 'package:clik_e/widgets/menu_option.dart';
 import 'package:flutter/material.dart';
 
 class EvaluationPage extends StatefulWidget {
-  const EvaluationPage({super.key, required this.formId, required this.type});
+  const EvaluationPage(
+      {super.key,
+      required this.formId,
+      required this.type,
+      this.studentName,
+      this.className});
 
   final String formId;
   final String type;
+  final String? studentName;
+  final String? className;
 
   @override
   State<EvaluationPage> createState() => _EvaluationPageState();
@@ -62,6 +69,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
       Section section,
       Map<String, Question> questionMap,
       String type,
+      Map<String, int> questionAnswerMap,
       Function(double value) sliderChange,
       Function(double? value) radioChange,
       sliderValue) {
@@ -72,8 +80,13 @@ class _EvaluationPageState extends State<EvaluationPage> {
     ];
 
     for (int i = 0; i < section.questions.length; ++i) {
-      children.add(questionGenerator(questionMap[section.questions[i]]!,
-          widget.type, sliderChange, radioChange, _currentSliderValue));
+      children.add(questionGenerator(
+          questionMap[section.questions[i]]!,
+          widget.type,
+          questionAnswerMap,
+          sliderChange,
+          radioChange,
+          _currentSliderValue));
     }
 
     children.add(const SizedBox(height: 16));
@@ -85,10 +98,23 @@ class _EvaluationPageState extends State<EvaluationPage> {
   Row questionGenerator(
       Question question,
       String type,
+      Map<String, int> questionAnswerMap,
       Function(double value) sliderChange,
       Function(double? value) radioChange,
       sliderValue) {
-    Widget InputControls = SizedBox(height: 32, width: 150, child: TextField());
+    Widget InputControls = SizedBox(
+        height: 32,
+        width: 150,
+        child: TextField(
+          controller: TextEditingController(),
+          onChanged: (String newValue) {
+            if (newValue.isNotEmpty) {
+              questionAnswerMap[question.id] = int.parse(newValue);
+            } else {
+              questionAnswerMap.remove(question.id);
+            }
+          },
+        ));
 
     if (type == "Schieberegler") {
       InputControls = Slider(
@@ -142,12 +168,12 @@ class _EvaluationPageState extends State<EvaluationPage> {
     } else if (type == "Dropdown") {
       InputControls = DropdownMenu(
         dropdownMenuEntries: [
-          DropdownMenuEntry(value: 1, label: "1"),
+          DropdownMenuEntry(value: 1, label: "1 trifft gar nicht zu"),
           DropdownMenuEntry(value: 2, label: "2"),
           DropdownMenuEntry(value: 3, label: "3"),
           DropdownMenuEntry(value: 4, label: "4"),
           DropdownMenuEntry(value: 5, label: "5"),
-          DropdownMenuEntry(value: 6, label: "6"),
+          DropdownMenuEntry(value: 6, label: "6 trifft voll zu"),
         ],
       );
     } else if (type == "Sterne") {
@@ -269,6 +295,7 @@ class _EvaluationPageState extends State<EvaluationPage> {
   @override
   Widget build(BuildContext context) {
     const double padding = 16;
+    Map<String, int> questionAnswerMap = {};
 
     void valueChange(double value) {
       setState(() {
@@ -325,12 +352,14 @@ class _EvaluationPageState extends State<EvaluationPage> {
                     Column(
                         children: snapshot.data!.form.sections
                             .map((section) => sectionGenerator(
-                                section,
-                                snapshot.data!.questionMap,
-                                widget.type,
-                                valueChange,
-                                radioChange,
-                                _currentSliderValue))
+                                  section,
+                                  snapshot.data!.questionMap,
+                                  widget.type,
+                                  questionAnswerMap,
+                                  valueChange,
+                                  radioChange,
+                                  _currentSliderValue,
+                                ))
                             .toList()),
                     const SizedBox(height: padding),
                     SizedBox(
@@ -341,6 +370,9 @@ class _EvaluationPageState extends State<EvaluationPage> {
                                 MaterialPageRoute(
                                   builder: (context) => AnalyzePage(
                                     formId: formId,
+                                    questionAnswerMap: questionAnswerMap,
+                                    studentName: widget.studentName,
+                                    className: widget.className,
                                   ),
                                 ),
                               );

@@ -1,4 +1,3 @@
-import 'package:clik_e/pages/evaluation_page2.dart';
 import 'package:clik_e/services/data_provider_service.dart';
 import 'package:clik_e/types/evaluation_form.dart';
 import 'package:clik_e/widgets/clik_appbar.dart';
@@ -30,7 +29,6 @@ Future<BackendData> getBackendData() async {
 class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
   late Future<BackendData> _backendData;
   String _formId = "";
-  int _evalId = 1;
   String _type = "text";
 
   @override
@@ -50,6 +48,9 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    String _studentName = "";
+    String _className = "";
+
     const double padding = 16;
 
     return Scaffold(
@@ -60,7 +61,51 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
         child: SingleChildScrollView(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(
-                "Diese Observationsbögen werden jeweils pro Schülerin und Schüler ausgeführt."),
+                "Die Evaluierungsbögen werden jeweils pro Schülerin und Schüler ausgeführt."),
+            SizedBox(
+              height: padding * 2,
+            ),
+            SizedBox(
+              width: 400,
+              child: Table(
+                children: [
+                  TableRow(children: [
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Text("Name Schüler/in:")),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: SizedBox(
+                        width: 250,
+                        child: TextField(
+                          controller: TextEditingController(),
+                          onChanged: (String newValue) {
+                            _studentName = newValue;
+                          },
+                        ),
+                      ),
+                    ),
+                  ]),
+                  TableRow(children: [
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Text("Klasse:")),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: SizedBox(
+                        width: 250,
+                        child: TextField(
+                          controller: TextEditingController(),
+                          onChanged: (String newValue) {
+                            _className = newValue;
+                          },
+                        ),
+                      ),
+                    ),
+                  ]),
+                ],
+              ),
+            ),
             SizedBox(
               height: padding * 2,
             ),
@@ -96,9 +141,9 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         DropdownMenu(
-                          onSelected: (formId) {
+                          onSelected: (dynamic formId) {
                             setState(() {
-                              _formId = formId;
+                              _formId = formId as String;
                             });
                           },
                           width: 300,
@@ -107,65 +152,41 @@ class _EvaluationSelectionPageState extends State<EvaluationSelectionPage> {
                           label: const Text(
                               "Wählen Sie einen Evaluierungsbogen aus."),
                         ),
-                        const SizedBox(height: padding),
-                        DropdownMenu(
-                          initialSelection: _evalId,
-                          onSelected: (int? evalId) {
-                            setState(() {
-                              _evalId = evalId!;
-                            });
-                          },
-                          width: 300,
-                          dropdownMenuEntries: [
-                            DropdownMenuEntry(
-                                value: 1, label: "Tabellarischer Fragebogen"),
-                            DropdownMenuEntry(
-                                value: 2, label: "Einzelne Fragen"),
-                          ],
-                          label: const Text("Art der Evaluation."),
-                        ),
-                        const SizedBox(height: padding),
-                        DropdownMenu<String>(
-                          initialSelection: _type,
-                          onSelected: (String? type) {
-                            setState(() {
-                              _type = type!;
-                            });
-                          },
-                          width: 300,
-                          dropdownMenuEntries: [
-                            DropdownMenuEntry(
-                                value: "text", label: "Eingabefeld"),
-                            DropdownMenuEntry(
-                                value: "Schieberegler", label: "Schieberegler"),
-                            DropdownMenuEntry(
-                                value: "Radiobutton", label: "Radiobutton"),
-                            DropdownMenuEntry(
-                                value: "Dropdown", label: "Dropdown"),
-                            DropdownMenuEntry(value: "Sterne", label: "Sterne"),
-                            DropdownMenuEntry(
-                                value: "Smileys", label: "Smileys"),
-                          ],
-                          label: const Text("InputControls."),
-                        ),
-                        const SizedBox(height: padding),
-                        ElevatedButton(
-                            onPressed: _formId != ""
-                                ? () {
-                                    MaterialPageRoute mpr = MaterialPageRoute(
-                                        builder: (context) => EvaluationPage(
-                                            formId: _formId, type: _type));
-                                    if (_evalId == 2) {
-                                      mpr = MaterialPageRoute(
-                                          builder: (context) => EvaluationPage2(
-                                              formId: _formId, type: _type));
-                                    }
-                                    Navigator.of(context).push(mpr);
-                                  }
-                                : null,
-                            child: const Text("Evaluierung starten")),
                       ]);
                 }),
+            const SizedBox(height: padding),
+            DropdownMenu<String>(
+              initialSelection: _type,
+              onSelected: (String? type) {
+                setState(() {
+                  _type = type!;
+                });
+              },
+              width: 300,
+              dropdownMenuEntries: [
+                DropdownMenuEntry(value: "text", label: "Eingabefeld"),
+                DropdownMenuEntry(
+                    value: "Schieberegler", label: "Schieberegler"),
+                DropdownMenuEntry(value: "Radiobutton", label: "Radiobutton"),
+                DropdownMenuEntry(value: "Dropdown", label: "Dropdown"),
+                DropdownMenuEntry(value: "Sterne", label: "Sterne"),
+                DropdownMenuEntry(value: "Smileys", label: "Smileys"),
+              ],
+              label: const Text("InputControls."),
+            ),
+            const SizedBox(height: padding),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => EvaluationPage(
+                          formId: _formId,
+                          type: _type,
+                          studentName:
+                              _studentName.isNotEmpty ? _studentName : null,
+                          className:
+                              _className.isNotEmpty ? _className : null)));
+                },
+                child: const Text("Evaluierung starten")),
           ]),
         ),
       ),

@@ -57,6 +57,7 @@ class _AnalyzeSelectionPageState extends State<AnalyzeSelectionPage> {
                         MaterialPageRoute(
                           builder: (context) => const AnalyzePage(
                             formId: "",
+                            questionAnswerMap: {},
                           ),
                         ),
                       );
