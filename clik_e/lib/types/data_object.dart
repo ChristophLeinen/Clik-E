@@ -10,6 +10,12 @@ class DataObject {
     return DataObject(id);
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+    };
+  }
+
   DataRow getDataRow(bool selected, Function onTap, int position) {
     void pressed() {
       onTap(position);

@@ -13,6 +13,14 @@ class Feature extends DataObject {
   }
 
   @override
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+    };
+  }
+
+  @override
   DataRow getDataRow(bool selected, Function onTap, int position) {
     void pressed() {
       onTap(position);
@@ -75,10 +83,11 @@ class Feature extends DataObject {
       SizedBox(
         width: 500,
         child: TextField(
-            controller: nameController,
-            onChanged: (String newValue) {
-              name = newValue;
-            }),
+          controller: nameController,
+          onChanged: (String newValue) {
+            name = newValue;
+          },
+        ),
       ),
     ]);
   }

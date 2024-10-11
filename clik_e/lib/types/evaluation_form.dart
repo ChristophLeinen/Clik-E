@@ -49,6 +49,19 @@ class EvaluationForm extends DataObject {
   }
 
   @override
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "description": description,
+      // "creationDate": creationDate,
+      // "modificationDate": modificationDate,
+      // "sections": sections,
+      // "suggestions": suggestions,
+    };
+  }
+
+  @override
   DataRow getDataRow(bool selected, Function onTap, int position) {
     void pressed() {
       onTap(position);

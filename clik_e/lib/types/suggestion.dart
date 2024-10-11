@@ -26,6 +26,17 @@ class Suggestion extends DataObject {
   }
 
   @override
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "suggestionsInstructions": suggestionsInstructions,
+      "expertExplanation": expertExplanation,
+      "expertReasoning": expertReasoning,
+      // "connectedLogics": connectedLogics,
+    };
+  }
+
+  @override
   DataRow getDataRow(bool selected, Function onTap, int position) {
     void pressed() {
       onTap(position);

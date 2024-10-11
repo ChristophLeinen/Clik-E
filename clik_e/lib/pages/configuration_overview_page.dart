@@ -135,6 +135,7 @@ class _ConfigurationOverviewPageState extends State<ConfigurationOverviewPage> {
                         try {
                           await dataService.removeItem(widget.viewName,
                               snapshot.data!.items[rowNumber].id);
+                          setState(() {});
                         } catch (exception) {
                           debugPrint("$exception");
                         }

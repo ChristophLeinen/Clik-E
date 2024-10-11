@@ -17,6 +17,15 @@ class Question extends DataObject {
   }
 
   @override
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "question": question,
+      "feature": feature,
+    };
+  }
+
+  @override
   DataRow getDataRow(bool selected, Function onTap, int position) {
     void pressed() {
       onTap(position);
@@ -77,63 +86,72 @@ class Question extends DataObject {
     questionController.text = question;
     featureController.text = feature;
 
-    Future<List<Feature>> getAllFeatures() async {
-      return await DataService<Feature>().getItems("features");
-    }
+    const double padding = 16;
 
-    List<DropdownMenuEntry> itemGenerator(List<Feature> features) {
-      List<DropdownMenuEntry> items = [];
-      for (int i = 0; i < features.length; ++i) {
-        items.add(
-            DropdownMenuEntry(value: features[i].id, label: features[i].name));
-      }
-
-      return items;
+    List<DropdownMenuEntry> featureItems = [];
+    List<Feature> features = relatedObjects["features"]! as List<Feature>;
+    for (int featureIndex = 0; featureIndex < features.length; ++featureIndex) {
+      featureItems.add(DropdownMenuEntry(
+        value: features[featureIndex].id,
+        label: features[featureIndex].name,
+      ));
     }
 
     return SizedBox(
-        width: 600,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      width: 600,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           const Text("ID"),
-          const SizedBox(height: 8),
-          TextField(
-            controller: idController,
-            enabled: false,
+          const SizedBox(
+            height: padding / 2,
           ),
-          const SizedBox(height: 16),
+          SizedBox(
+            width: 500,
+            child: TextField(
+              controller: idController,
+              enabled: false,
+            ),
+          ),
+          const SizedBox(
+            height: padding,
+          ),
           const Text("Fragetext"),
-          const SizedBox(height: 8),
-          TextField(
-            controller: questionController,
+          const SizedBox(
+            height: padding / 2,
           ),
-          const SizedBox(height: 16),
+          SizedBox(
+            width: 500,
+            child: TextField(
+              controller: questionController,
+              onChanged: (String newValue) {
+                question = newValue;
+              },
+            ),
+          ),
+          const SizedBox(
+            height: padding,
+          ),
           const Text("Kompetenz und Eigenschaft"),
-          const SizedBox(height: 8),
-          FutureBuilder(
-              future: getAllFeatures(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
+          const SizedBox(
+            height: padding / 2,
+          ),
+          DropdownMenu(
+            initialSelection: feature,
+            dropdownMenuEntries: featureItems,
+            label: const Text("Wähle eine Kompetenz und Eigenschaft aus."),
+            onSelected: (dynamic newValue) {
+              feature = newValue as String;
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
-                if (snapshot.hasError && !snapshot.hasData) {
-                  return TextField(
-                    controller: featureController,
-                    enabled: false,
-                  );
-                }
-
-                if (!snapshot.hasData) {
-                  return const Text("Eintrag nicht gefunden.");
-                }
-
-                return DropdownMenu(
-                  initialSelection: feature,
-                  dropdownMenuEntries: itemGenerator(snapshot.data!),
-                  label:
-                      const Text("Wähle eine Kompetenz und Eigenschaft aus."),
-                );
-              }),
-        ]));
+  @override
+  Future<Map<String, List<DataObject>>> getRelatedItems() async {
+    List<Feature> features = await DataService<Feature>().getItems("features");
+    return {"features": features};
   }
 }

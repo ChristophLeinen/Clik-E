@@ -199,6 +199,7 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
                           children: [
                             ElevatedButton(
                                 onPressed: () async {
+                                  Navigator.pop(context);
                                   DataService dataService =
                                       getDataService(widget.viewName);
                                   try {
@@ -216,7 +217,6 @@ class _ConfigurationDetailPageState extends State<ConfigurationDetailPage> {
                                   } catch (exception) {
                                     debugPrint("exception: $exception");
                                   }
-                                  Navigator.pop(context);
                                 },
                                 child: Text("Speichern")),
                             const SizedBox(width: padding),
